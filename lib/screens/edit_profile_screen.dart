@@ -264,11 +264,7 @@ class _EditProfileState extends State<EditProfile> {
       return;
     }
 
-    // Create a multipart request
-    final request = http.MultipartRequest(
-      'POST',
-      Uri.parse(Api_network.editProfile),
-    );
+    final request = http.MultipartRequest('POST', Uri.parse(Api_network.editProfile));
 
     request.fields['id'] = id;
     request.fields['name'] = name;

@@ -7,6 +7,7 @@ import 'package:car_bulao_driver/model/DrivingLicenseEdit.dart';
 import 'package:http/http.dart' as http;
 import 'package:url_launcher/url_launcher.dart';
 import '../model/EditProfileModel.dart';
+import '../model/car_details_model.dart';
 import '../model/documentsModel.dart';
 import '../model/loginModel.dart';
 import '../model/myProfileModel.dart';
@@ -88,7 +89,7 @@ class Api_helper {
       return DrivingLicenseEdit(message: "Somthing went wrong");
     }
   }
-  
+
   Future<documentsModel> documents (Map<String,dynamic>map) async{
     Uri url  = Uri.parse(Api_network.doc);
     final response = await http.post(url,body: map);
@@ -104,7 +105,24 @@ class Api_helper {
     catch(e){
       return documentsModel(status: response.body);
     }
-    
+
+  }
+
+  Future<car_details_model> carDetails(Map<String,dynamic> map) async{
+    Uri url = Uri.parse(Api_network.carShow);
+    try{
+      final response = await http.post(url,body: map);
+      if(response.statusCode==200){
+        return car_details_model.fromJson(jsonDecode(response.body));
+      }
+      else{
+        return car_details_model(message: "Somthing went wrong");
+      }
+    }
+    catch(e){
+      return car_details_model(message: "Somthing went wrong");
+
+    }
   }
 
   Future<ContactusModel> contactUs(Map<String, dynamic> map) async {

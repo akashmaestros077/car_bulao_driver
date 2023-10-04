@@ -1,8 +1,13 @@
 import 'dart:io';
-
+import 'package:car_bulao_driver/Api/Api_helper.dart';
+import 'package:car_bulao_driver/SessionManager.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:http/http.dart' as http;
+
+import '../../../Api/Api_network.dart';
+import '../../../model/car_details_model.dart';
 
 class CarDetails extends StatefulWidget {
   const CarDetails({super.key});
@@ -12,9 +17,32 @@ class CarDetails extends StatefulWidget {
 }
 
 class _CarDetailsState extends State<CarDetails> {
+  TextEditingController carName = TextEditingController();
+  TextEditingController carModel = TextEditingController();
+  TextEditingController fuelType = TextEditingController();
+  TextEditingController licenseplatenum = TextEditingController();
+  TextEditingController numofSeat = TextEditingController();
+
   bool isVisibility = true;
   final ImagePicker imagePicker = ImagePicker();
   File? image;
+
+  late Future<car_details_model> cardetailsfuture;
+
+  @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+    cardetailsfuture = showCar();
+  }
+
+  Future<car_details_model> showCar() async {
+    String userId = SessionManager.getUserId();
+    Map<String, String> body = {
+      "owner_id": userId,
+    };
+    return Api_helper().carDetails(body);
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -247,5 +275,67 @@ class _CarDetailsState extends State<CarDetails> {
       image = File(xFileImage.path);
       setState(() {});
     }
+  }
+
+  Future<void> addCarDetails() async {
+    String carname = carName.text;
+    String carmodel = carModel.text;
+    String fuel = fuelType.text;
+    String license = licenseplatenum.text;
+    String numseat = numofSeat.text;
+    String userId = SessionManager.getUserId();
+    File img = File(image!.path);
+    String km = '20';
+
+    if (img == null) {
+      message("Select Image");
+      return;
+    }
+    if (carname.isEmpty) {
+      message("Enter car Name");
+      return;
+    }
+    if (carmodel.isEmpty) {
+      message("Enter Car Model Name");
+      return;
+    }
+    if (fuel.isEmpty) {
+      message("Enter Fuel Type");
+      return;
+    }
+    if (license.isEmpty) {
+      message("Enter License Plate Number");
+      return;
+    }
+    if (numseat.isEmpty) {
+      message("Enter Number Of Seats");
+      return;
+    }
+
+    var request =
+        http.MultipartRequest('POST', Uri.parse(Api_network.addCarDetails));
+    request.files.add(await http.MultipartFile.fromPath('image', img.path));
+    request.fields.addAll({
+      "name": carname,
+      "price": "299",
+      "car_modal": carmodel,
+      "fuel_type": fuel,
+      "license_plate_number": license,
+      "number_of_seats": numseat,
+      "owner_id": userId,
+      "km": km,
+    });
+
+    http.StreamedResponse response = await request.send();
+
+    if (response.statusCode == 200) {
+      message('Updated successfully');
+    } else {
+      message('Something went wrong');
+    }
+  }
+
+  void message(String s) {
+    ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(s)));
   }
 }

@@ -144,7 +144,6 @@ class _IdentityCardState extends State<IdentityCard> {
     String cardNumber = carNumberController.text;
     File img = File(image!.path);
     String userId = SessionManager.getUserId();
-    print("identtiy" + SessionManager.getUserId());
 
     if (cardNumber.isEmpty) {
       return message("Enter Card Number");
