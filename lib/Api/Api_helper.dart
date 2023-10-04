@@ -88,6 +88,24 @@ class Api_helper {
       return DrivingLicenseEdit(message: "Somthing went wrong");
     }
   }
+  
+  Future<documentsModel> documents (Map<String,dynamic>map) async{
+    Uri url  = Uri.parse(Api_network.doc);
+    final response = await http.post(url,body: map);
+
+    try{
+      if(response.statusCode==200){
+        return documentsModel.fromJson(jsonDecode(response.body));
+      }
+      else{
+        return documentsModel(status: response.body);
+      }
+    }
+    catch(e){
+      return documentsModel(status: response.body);
+    }
+    
+  }
 
   Future<ContactusModel> contactUs(Map<String, dynamic> map) async {
     Uri url = Uri.parse(Api_network.contact);
