@@ -1,5 +1,6 @@
 import 'dart:io';
 
+import 'package:car_bulao_driver/screens/drawer/CarDetails_Screens/add_car_details_screen.dart';
 import 'package:car_bulao_driver/screens/drop_off_screen.dart';
 import 'package:car_bulao_driver/screens/edit_profile_screen.dart';
 import 'package:car_bulao_driver/screens/forgot_password_screen.dart';
@@ -88,6 +89,7 @@ class MyApp extends StatelessWidget {
         'driving': (context) => DrivingLicense(),
         'identity_card': (context) => IdentityCard(),
         'car_details': (context) => CarDetails(),
+        'add_car_details_screen' : (context) => AddCarDetails(),
       },
     );
   }
