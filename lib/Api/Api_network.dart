@@ -16,5 +16,6 @@ class Api_network{
        static const String showBooking = "$baseUrl?action=show_booking";
        static const String addCarDetails = "$baseUrl_2/add_car_api.php";
        static const String carShow = "$baseUrl_2/owner_all_cars.php";
+       static const String showCar = "$baseUrl_2/owner_all_cars.php";
 
 }

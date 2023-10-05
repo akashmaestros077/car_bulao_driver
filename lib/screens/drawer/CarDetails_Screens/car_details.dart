@@ -5,9 +5,11 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:http/http.dart' as http;
+import 'package:line_icons/line_icon.dart';
 
 import '../../../Api/Api_network.dart';
 import '../../../model/car_details_model.dart';
+import '../../../model/showCarModel.dart';
 
 class CarDetails extends StatefulWidget {
   const CarDetails({super.key});
@@ -27,21 +29,11 @@ class _CarDetailsState extends State<CarDetails> {
   final ImagePicker imagePicker = ImagePicker();
   File? image;
 
-  late Future<car_details_model> cardetailsfuture;
+  late Future<showCarModel> showcar_future;
 
-  @override
   void initState() {
-    // TODO: implement initState
     super.initState();
-    cardetailsfuture = showCar();
-  }
-
-  Future<car_details_model> showCar() async {
-    String userId = SessionManager.getUserId();
-    Map<String, String> body = {
-      "owner_id": userId,
-    };
-    return Api_helper().carDetails(body);
+    showcar_future = showCarDetails();
   }
 
   @override
@@ -64,6 +56,64 @@ class _CarDetailsState extends State<CarDetails> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.center,
           children: [
+            Expanded(
+              child: FutureBuilder<showCarModel>(
+                  future: showcar_future,
+                  builder: (context, snapshot) {
+                    if (snapshot.connectionState == ConnectionState.waiting) {
+                      return Center(child: CircularProgressIndicator());
+                    } else if (snapshot.hasError) {
+                      return Text("Errors ${snapshot.hasError}");
+                    } else if (!snapshot.hasData) {
+                      return Text("Data not found");
+                    } else {
+                      final showData = snapshot.data?.carData;
+                      return ListView.builder(
+                          itemCount: showData?.length,
+                          itemBuilder: (BuildContext context, int index) {
+                            final car = showData?[index];
+                            return Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              children: [
+                                CircleAvatar(
+                                  child: SizedBox(
+                                    height: 30,
+                                    child: Image.network(
+                                      car?.image.toString() ??"",
+                                    ),
+                                  ),
+                                ),
+                                Column(
+                                  children: [
+                                    Text(
+                                      car?.name.toString() ?? " ",
+                                      style: GoogleFonts.fahkwang(
+                                          fontSize: 15,
+                                          fontWeight: FontWeight.bold),
+                                    ),
+                                    Text(
+                                      car?.licensePlateNumber.toString() ??" ",
+                                      style: TextStyle(
+                                        fontWeight: FontWeight.normal,
+                                        fontSize: 13,
+                                        color: Colors.grey,
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                                TextButton(
+                                    onPressed: () {
+                                      setState(() {
+                                        isVisibility = false;
+                                      });
+                                    },
+                                    child: Text("Edit Details")),
+                              ],
+                            );
+                          });
+                    }
+                  }),
+            ),
             Visibility(
               visible: isVisibility,
               child: Row(
@@ -123,7 +173,9 @@ class _CarDetailsState extends State<CarDetails> {
                           width: 300,
                         ),
                       ),
-                      SizedBox(height: 5,),
+                      SizedBox(
+                        height: 5,
+                      ),
                       InkWell(
                         onTap: () {
                           pickImage(ImageSource.gallery);
@@ -137,7 +189,8 @@ class _CarDetailsState extends State<CarDetails> {
                                 style: GoogleFonts.fahkwang(
                                     fontSize: 15, color: Color(0xff28a745)),
                               ),
-                              Icon(Icons.camera_alt,size: 25,color: Colors.green),
+                              Icon(Icons.camera_alt,
+                                  size: 25, color: Colors.green),
                             ],
                           ),
                         ),
@@ -234,7 +287,8 @@ class _CarDetailsState extends State<CarDetails> {
                     height: 15,
                   ),
                   SizedBox(
-                    height: 45,width: double.infinity,
+                    height: 45,
+                    width: double.infinity,
                     child: ElevatedButton(
                       style: ElevatedButton.styleFrom(
                         backgroundColor: Color(0xff28a745),
@@ -248,7 +302,7 @@ class _CarDetailsState extends State<CarDetails> {
                         });
                       },
                       child: Padding(
-                        padding:  EdgeInsets.all(10),
+                        padding: EdgeInsets.all(10),
                         child: Text(
                           'ADD',
                           style: GoogleFonts.fahkwang(
@@ -287,7 +341,7 @@ class _CarDetailsState extends State<CarDetails> {
     File img = File(image!.path);
     String km = '20';
 
-    if (img == null) {
+    if (null == img) {
       message("Select Image");
       return;
     }
@@ -337,5 +391,13 @@ class _CarDetailsState extends State<CarDetails> {
 
   void message(String s) {
     ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(s)));
+  }
+
+  Future<showCarModel> showCarDetails() async {
+    String userId = SessionManager.getUserId();
+    Map<String, String> body = {
+      'owner_id': userId,
+    };
+    return Api_helper().ShowCar(body);
   }
 }

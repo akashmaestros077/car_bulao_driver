@@ -2,8 +2,8 @@ import 'dart:convert';
 import 'package:car_bulao_driver/Api/Api_network.dart';
 import 'package:car_bulao_driver/model/ContactusModel.dart';
 import 'package:car_bulao_driver/model/PrivacyModel.dart';
-import 'package:car_bulao_driver/model/identityCardModel.dart';
 import 'package:car_bulao_driver/model/DrivingLicenseEdit.dart';
+import 'package:car_bulao_driver/model/showCarModel.dart';
 import 'package:http/http.dart' as http;
 import 'package:url_launcher/url_launcher.dart';
 import '../model/EditProfileModel.dart';
@@ -90,40 +90,35 @@ class Api_helper {
     }
   }
 
-  Future<documentsModel> documents (Map<String,dynamic>map) async{
-    Uri url  = Uri.parse(Api_network.doc);
-    final response = await http.post(url,body: map);
+  Future<documentsModel> documents(Map<String, dynamic> map) async {
+    Uri url = Uri.parse(Api_network.doc);
+    final response = await http.post(url, body: map);
 
-    try{
-      if(response.statusCode==200){
+    try {
+      if (response.statusCode == 200) {
         return documentsModel.fromJson(jsonDecode(response.body));
-      }
-      else{
+      } else {
         return documentsModel(status: response.body);
       }
-    }
-    catch(e){
+    } catch (e) {
       return documentsModel(status: response.body);
     }
-
   }
 
-  Future<car_details_model> carDetails(Map<String,dynamic> map) async{
+  Future<car_details_model> carDetails(Map<String, dynamic> map) async {
     Uri url = Uri.parse(Api_network.carShow);
-    try{
-      final response = await http.post(url,body: map);
-      if(response.statusCode==200){
+    try {
+      final response = await http.post(url, body: map);
+      if (response.statusCode == 200) {
         return car_details_model.fromJson(jsonDecode(response.body));
-      }
-      else{
+      } else {
         return car_details_model(message: "Somthing went wrong");
       }
-    }
-    catch(e){
+    } catch (e) {
       return car_details_model(message: "Somthing went wrong");
-
     }
   }
+
 
   Future<ContactusModel> contactUs(Map<String, dynamic> map) async {
     Uri url = Uri.parse(Api_network.contact);
@@ -165,4 +160,22 @@ class Api_helper {
       throw " Somthing went wrong";
     }
   }
+
+  Future<showCarModel> ShowCar(Map<String, dynamic>map) async {
+    Uri url = Uri.parse(Api_network.showCar);
+
+    try {
+      final response = await http.post(url, body: map);
+      if (response.statusCode == 200) {
+        return showCarModel.fromJson(jsonDecode(response.body));
+      }
+      else{
+        return showCarModel(message: "Somthing went wrong");
+      }
+    }
+    catch(e){
+      return showCarModel(message: "Somthing went wrong");
+    }
+  }
+
 }
